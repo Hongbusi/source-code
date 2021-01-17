@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root">
+    <p>{{ name }}</p>
+    <p>{{ age }}</p>
+  </div>
+
+  <script>
+    // 1. Vue 使用的虚拟 DOM
+    // 2. 只考虑了单属性 ({{ name }}), 而 Vue 中大量的使用层级 ({{ child.name.firstName }})
+    // 3. 代码没有整合
+
+
+    // 1. 代码整合
+
+    let rBrackets = /\{\{(.*?)\}\}/g;
+
+    function compiler(template, data) {
+      let childNodes = template.childNodes;
+      for (let i = 0; i < childNodes.length; i++) {
+        let type = childNodes[i].nodeType;
+        if (type === 3) {
+          let txt = childNodes[i].nodeValue;
+          txt = txt.replace(rBrackets, (_, g) => {
+            let key = g.trim();
+            let value = data[key];
+            return value;
+          });
+          childNodes[i].nodeValue = txt;
+        } else if (type === 1) {
+          compiler(childNodes[i], data);
+        }
+      }
+    }
+
+    function Vue(options) {
+      // 习惯: 内部的数据使用 _ 开头, 只读数据使用 $ 开头
+      this._el = options.el;
+      this._data = options.data;
+
+      // 准备工作 (准备模板)
+      this.$el = this._templateDom = document.querySelector(this._el);
+      this._parent = this._templateDom.parentNode;
+
+      // 渲染工作
+      this.render();
+    }
+    
+    // 模板结合数据, 得到 HTML 加到页面中
+    Vue.prototype.render = function () {
+      this.compile();
+    }
+
+    // 编译将模板与数据结合得到真正的 DOM 元素
+    Vue.prototype.compile = function () {
+      let realHTMLDOM = this._templateDom.cloneNode(true);
+      compiler(realHTMLDOM, this._data);
+      this.update(realHTMLDOM);
+    }
+
+    // 将 DOM的元素, 放到页面中
+    Vue.prototype.update = function (real) {
+      this._parent.replaceChild(real, document.querySelector('#root'));
+    }
+
+
+    let app = new Vue({
+      el: '#root',
+      data: {
+        name: 'Hongbusi',
+        age: 18
+      },
+    });
+  </script>
+</body>
+</html>
