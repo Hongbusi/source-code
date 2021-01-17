@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root">
+    <p>{{ perple.user.name }}</p>
+    <p>{{ perple.user.age }}</p>
+  </div>
+
+  <script>
+    // 1. Vue 使用的虚拟 DOM
+    // 2. 只考虑了单属性 ({{ name }}), 而 Vue 中大量的使用层级 ({{ perple.user.name }})
+    // 3. 代码没有整合
+
+
+    // 2. 代码整合
+
+    let rBrackets = /\{\{(.*?)\}\}/g;
+
+    function getValueByPath(obj, path) {
+      let paths = path.split('.');
+      let res = obj;
+      let prop;
+      while(prop = paths.shift()) {
+        res = res[prop];
+      }
+      return res;
+    }
+
+    function compiler(template, data) {
+      let childNodes = template.childNodes;
+      for (let i = 0; i < childNodes.length; i++) {
+        let type = childNodes[i].nodeType;
+        if (type === 3) {
+          let txt = childNodes[i].nodeValue;
+          txt = txt.replace(rBrackets, (_, g) => {
+            let path = g.trim();
+            let value = getValueByPath(data, path);
+            return value;
+          });
+          childNodes[i].nodeValue = txt;
+        } else if (type === 1) {
+          compiler(childNodes[i], data);
+        }
+      }
+    }
+
+    function Vue(options) {
+      this._el = options.el;
+      this._data = options.data;
+
+      this.$el = this._templateDom = document.querySelector(this._el);
+      this._parent = this._templateDom.parentNode;
+
+      this.render();
+    }
+    
+    Vue.prototype.render = function () {
+      this.compile();
+    }
+
+    Vue.prototype.compile = function () {
+      let realHTMLDOM = this._templateDom.cloneNode(true);
+      compiler(realHTMLDOM, this._data);
+      this.update(realHTMLDOM);
+    }
+
+    Vue.prototype.update = function (real) {
+      this._parent.replaceChild(real, document.querySelector('#root'));
+    }
+
+
+    let app = new Vue({
+      el: '#root',
+      data: {
+        perple: {
+          user: {
+            name: 'Hongbusi',
+            age: 18
+          }
+        }
+      },
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root">
+
+  </div>
+
+  <script>
+    // 1. Vue 使用的虚拟 DOM
+    // 2. 只考虑了单属性 ({{ name }}), 而 Vue 中大量的使用层级 ({{ child.name.firstName }})
+    // 3. 代码没有整合
+
+    // 2. 只考虑了单属性 ({{ name }}), 而 Vue 中大量的使用层级 ({{ people.user.name }})
+    
+    // 要解决一个问题
+    // 使用 'xxx.yyy.zzz' 可以访问某个对象
+    // 就是用字符串路径来访问对象的成员
+
+    function getValueByPath(obj, path) {
+      let paths = path.split('.'); // [xxx, yyy, zzz]
+      // 先取得 obj.xxx, 再取得结果中的 yyy, 再取得结果中的 zzz
+      // let res = null;
+      // res = obj[paths[0]];
+      // res = res[paths[1]];
+      // res = res[paths[2]];
+
+      let res = obj;
+      let prop;
+      while(prop = paths.shift()) {
+        res = res[prop];
+      }
+      return res;
+    }
+  </script>
+</body>
+</html>
