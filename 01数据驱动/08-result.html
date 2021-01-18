@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root">
+    <p>{{ people.user.name }}</p>
+    <p>{{ a.b.c.d.e }}</p>
+  </div>
+
+  <script>
+    function compiler(template, data) {
+      let childNodes = template.children;
+      for (let i = 0; i < childNodes.length; i++) {
+        let nodeType = childNodes[i].type;
+        if (nodeType === 3) {
+          let txt = childNodes[i].value;
+          txt = txt.replace(/\{\{(.*?)\}\}/g, (_, g) => {
+            let path = g.trim();
+            let value = getValueByPath(data, path);
+            return value;
+          });
+          childNodes[i].value = txt;
+        } else if (nodeType === 1) {
+          compiler(childNodes[i], data);
+        }  
+      }
+    }
+
+    function getValueByPath(data, path) {
+      let paths = path.split('.');
+      let res = data;
+      let prop;
+      while(prop = paths.shift()) {
+        res = res[prop];
+      }
+      return res;
+    }
+
+    class VNode {
+      constructor(tag, data, value, type) {
+        this.tag = tag && tag.toLowerCase();
+        this.data = data;
+        this.value = value;
+        this.type = type;
+        this.children = [];
+      }
+
+      appendChild(vnode) {
+        this.children.push(vnode);
+      }
+    }
+
+    function getVNode(node) {
+      let nodeType = node.nodeType;
+      let _vnode = null;
+      if (nodeType === 1) {
+        let nodeName = node.nodeName;
+        let attrs = node.attributes;
+        let _attrObj = {};
+        for (let i = 0; i < attrs.length; i++) {
+          _attrObj[attrs[i].nodeName] = attrs[i].nodeValue;
+        }
+        _vnode = new VNode(nodeName, _attrObj, undefined, nodeType)
+
+        let childNodes = node.childNodes;
+        for (let i = 0; i < childNodes.length; i++) {
+          _vnode.appendChild(getVNode(childNodes[i]));
+          
+        }
+      } else if (nodeType === 3) {
+        _vnode = new VNode(undefined, undefined, node.nodeValue, nodeType);
+      }
+      return _vnode;
+    }
+
+    function parseVNode(vnode) {
+      let type = vnode.type;
+      let _node = null;
+
+      if (type === 3) {
+        return document.createTextNode(vnode.value);
+      } else if (type === 1) {
+        _node = document.createElement(vnode.tag);
+        let data = vnode.data;
+        Object.keys(data).forEach((key) => {
+          let attrName = key;
+          let attrValue = data[key];
+          _node.setAttribute(attrName, attrValue);
+        });
+
+        let children = vnode.children;
+        children.forEach(subvnode => {
+          _node.appendChild(parseVNode(subvnode));
+        });
+        return _node;
+      }
+    }
+
+    class Vue {
+      constructor(options) {
+        this._el = options.el;
+        this._data = options.data;
+
+        this.$el = this._templateDOM = document.querySelector(this._el);
+        this._parent = this._templateDOM.parentNode;
+
+        this.render();
+      }
+    }
+
+    Vue.prototype.render = function() {
+      this.compiler();
+    }
+
+    Vue.prototype.compiler = function() {
+      let vroot = getVNode(this._templateDOM);
+      compiler(vroot, this._data);
+
+      let dom = parseVNode(vroot);
+      this.update(dom);
+    }
+
+    Vue.prototype.update = function(real) {
+      this._parent.replaceChild(real, this._templateDOM);
+    }
+
+    let app = new Vue({
+      el: '#root',
+      data: {
+        people: {
+          user: {
+            name: 'Hongbusi'
+          }
+        },
+        a: {
+          b: {
+            c: {
+              d: {
+                e: 'ok'
+              }
+            }
+          }
+        }
+      },
+    });
+  </script>
+</body>
+</html>
