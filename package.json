@@ -6,6 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": ""
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Hongbusi/vue-source-code.git"
@@ -15,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/Hongbusi/vue-source-code/issues"
   },
-  "homepage": "https://github.com/Hongbusi/vue-source-code#readme"
+  "homepage": "https://github.com/Hongbusi/vue-source-code#readme",
+  "devDependencies": {
+    "eslint": "^7.18.0",
+    "husky": "^4.3.8"
+  }
 }
