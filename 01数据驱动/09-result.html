@@ -8,38 +8,9 @@
 <body>
   <div id="root">
     <p>{{ people.user.name }}</p>
-    <p>{{ a.b.c.d.e }}</p>
   </div>
 
   <script>
-    function compiler(template, data) {
-      let childNodes = template.children;
-      for (let i = 0; i < childNodes.length; i++) {
-        let nodeType = childNodes[i].type;
-        if (nodeType === 3) {
-          let txt = childNodes[i].value;
-          txt = txt.replace(/\{\{(.*?)\}\}/g, (_, g) => {
-            let path = g.trim();
-            let value = getValueByPath(data, path);
-            return value;
-          });
-          childNodes[i].value = txt;
-        } else if (nodeType === 1) {
-          compiler(childNodes[i], data);
-        }  
-      }
-    }
-
-    function getValueByPath(data, path) {
-      let paths = path.split('.');
-      let res = data;
-      let prop;
-      while(prop = paths.shift()) {
-        res = res[prop];
-      }
-      return res;
-    }
-
     class VNode {
       constructor(tag, data, value, type) {
         this.tag = tag && tag.toLowerCase();
@@ -79,16 +50,15 @@
     function parseVNode(vnode) {
       let type = vnode.type;
       let _node = null;
-
       if (type === 3) {
         return document.createTextNode(vnode.value);
       } else if (type === 1) {
         _node = document.createElement(vnode.tag);
         let data = vnode.data;
-        Object.keys(data).forEach((key) => {
+        Object.keys(data).forEach(key => {
           let attrName = key;
-          let attrValue = data[key];
-          _node.setAttribute(attrName, attrValue);
+          let attrVlaue = data[key];
+          _node.setAttribute(attrName, attrVlaue);
         });
 
         let children = vnode.children;
@@ -99,11 +69,38 @@
       }
     }
 
+    function getValueByPath(data, path) {
+      let paths = path.split('.');
+      let res = data;
+      let prop;
+      while (prop = paths.shift()) {
+        res = res[prop];
+      }
+      return res;
+    }
+
+    function compiler(template, data) {
+      let childNodes = template.children;
+      for (let i = 0; i < childNodes.length; i++) {
+        let nodeType = childNodes[i].type;
+        if (nodeType === 3) {
+          let txt = childNodes[i].value;
+          txt = txt.replace(/\{\{(.*?)\}\}/g, (_, g) => {
+            let path = g.trim();
+            let value = getValueByPath(data, path);
+            return value;
+          });
+          childNodes[i].value = txt;
+        } else if (nodeType === 1) {
+          compiler(childNodes[i], data);
+        }
+      }
+    }
+
     class Vue {
       constructor(options) {
         this._el = options.el;
         this._data = options.data;
-
         this.$el = this._templateDOM = document.querySelector(this._el);
         this._parent = this._templateDOM.parentNode;
 
@@ -116,15 +113,14 @@
     }
 
     Vue.prototype.compiler = function() {
-      let vroot = getVNode(this._templateDOM);
-      compiler(vroot, this._data);
-
-      let dom = parseVNode(vroot);
-      this.update(dom);
+      let vnode = getVNode(this._templateDOM);
+      compiler(vnode, this._data);
+      let realDOM = parseVNode(vnode);
+      this.update(realDOM);
     }
 
-    Vue.prototype.update = function(real) {
-      this._parent.replaceChild(real, this._templateDOM);
+    Vue.prototype.update = function(realDOM) {
+      this._parent.replaceChild(realDOM, this._templateDOM);
     }
 
     let app = new Vue({
@@ -134,17 +130,8 @@
           user: {
             name: 'Hongbusi'
           }
-        },
-        a: {
-          b: {
-            c: {
-              d: {
-                e: 'ok'
-              }
-            }
-          }
         }
-      },
+      }
     });
   </script>
 </body>
