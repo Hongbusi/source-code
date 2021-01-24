@@ -1,3 +1,5 @@
+const rules = require('./rules');
+
 module.exports = {
     "env": {
         "browser": true,
@@ -8,6 +10,5 @@ module.exports = {
         "ecmaVersion": 12,
         "sourceType": "module"
     },
-    "rules": {
-    }
+    "rules": rules
 };
