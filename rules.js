@@ -4,7 +4,7 @@ module.exports = {
   "no-async-promise-executor": "off",
   "no-await-in-loop": "off",
   "no-compare-neg-zero": "off",
-  "no-cond-assign": "error",                             // 禁止条件表达式中出现赋值操作符
+  "no-cond-assign": "off",                               // 禁止条件表达式中出现赋值操作符
   "no-console": "error",                                 // 禁用 console
   "no-constant-condition": "error",                      // 禁止在条件中使用常量表达式
   "no-control-regex": "off",
