@@ -19,5 +19,5 @@ module.exports = {
   "no-extra-parens": "error",                            // 禁止不必要的括号
   "no-extra-semi": "error",                              // 禁止不必要的分号
   "no-func-assign": "error",                             // 禁止对 function 声明重新赋值
-  "no-inner-declarations": "error",                      // 禁止在嵌套的块中出现变量声明或 function 声明
+  "no-inner-declarations": "off",                      // 禁止在嵌套的块中出现变量声明或 function 声明
 }
