@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+</body>
+<script>
+  let array = ['牛', 'a', '阿尔', 'b', '木头', '3', 'c', '2', '1'];
+
+  // methods 1: 文字跑到字母前面了
+  let resultArray = array.sort((param1, param2) => param1.localeCompare(param2));
+  console.log(resultArray); // ["1", "2", "3", "阿尔", "木头", "牛", "a", "b", "c"]
+
+  // methods 2
+  const isLetterOrNumberReg = /[0-9a-z]+/i;
+  let resultArray2 = array.sort((param1, param2) => {
+    if (isLetterOrNumberReg.test(param1) && !isLetterOrNumberReg.test(param2)) {
+      return -1;
+    }
+    if (!isLetterOrNumberReg.test(param1) && isLetterOrNumberReg.test(param2)) {
+      return 1;
+    }
+    return param1.localeCompare(param2);
+  });
+  console.log(resultArray2); // ["1", "2", "3", "a", "b", "c", "阿尔", "木头", "牛"]
+</script>
+</html>
