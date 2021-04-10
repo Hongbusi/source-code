@@ -1,5 +1,5 @@
 {
-  "name": "vue-source-code",
+  "name": "source-code",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Hongbusi/vue-source-code.git"
+    "url": "git+https://github.com/Hongbusi/source-code.git"
   },
   "author": "Hongbusi",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Hongbusi/vue-source-code/issues"
+    "url": "https://github.com/Hongbusi/source-code/issues"
   },
-  "homepage": "https://github.com/Hongbusi/vue-source-code#readme",
+  "homepage": "https://github.com/Hongbusi/source-code#readme",
   "devDependencies": {
     "eslint": "^7.18.0",
     "husky": "^4.3.8"
