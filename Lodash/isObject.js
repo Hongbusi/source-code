@@ -10,9 +10,3 @@ function isObject(value) {
 }
 
 export default isObject;
-
-// test
-console.log(isObject({}));
-console.log(isObject([1, 2, 3]));
-console.log(isObject(Function));
-console.log(isObject(null));
